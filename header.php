@@ -1,36 +1,44 @@
 <!DOCTYPE html>
 <html <?php language_attributes(); ?>>
 <head>
-    <meta charset="<?php bloginfo( 'charset' ); ?>">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="profile" href="https://gmpg.org/xfn/11">
-    <?php wp_head(); ?>
+	<meta charset="<?php bloginfo( 'charset' ); ?>">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="profile" href="https://gmpg.org/xfn/11">
+	<?php wp_head(); ?>
 </head>
-<body <?php body_class( 'minimal-corporate' ); ?>>
+<body <?php body_class(); ?>>
 <?php wp_body_open(); ?>
 
-    <!-- Navigation -->
-    <nav id="main-nav">
-        <div class="container nav-content">
-            <div class="logo">
-                <a href="<?php echo esc_url( home_url( '/' ) ); ?>" rel="home" class="logo-wrap">
-                    <div class="logo-main"><span class="box">DIGI</span><span class="text">GYAPAN</span></div>
-                </a>
-            </div>
-            <div class="nav-links">
-                <?php
-                wp_nav_menu(
-                    array(
-                        'theme_location' => 'menu-1',
-                        'menu_id'        => 'primary-menu',
-                        'container'      => false,
-                        'fallback_cb'    => 'digi_fallback_menu',
-                    )
-                );
-                ?>
-            </div>
-            <div class="nav-cta">
-                <a href="#contact" class="btn btn-primary">Sign up</a>
-            </div>
-        </div>
-    </nav>
+<header class="site-header glass">
+	<div class="container nav-container">
+		<div class="logo">
+			<a href="<?php echo esc_url( home_url( '/' ) ); ?>">
+				<div class="logo-square">
+					<span class="logo-digi">DIGI</span><span class="logo-gyapan">GYAPAN</span>
+				</div>
+			</a>
+		</div>
+
+		<nav class="nav-menu">
+			<?php
+			if ( has_nav_menu( 'menu-header' ) ) {
+				wp_nav_menu(
+					array(
+						'theme_location' => 'menu-header',
+						'menu_class'     => 'header-nav-list',
+						'container'      => false,
+					)
+				);
+			} else {
+				digi_header_menu_fallback();
+			}
+			?>
+		</nav>
+
+		<div class="nav-toggle">
+			<span></span>
+			<span></span>
+			<span></span>
+		</div>
+	</div>
+</header>

@@ -5,73 +5,130 @@
  * @package Digi
  */
 
-get_header(); ?>
+get_header();
+?>
 
-<main id="primary" class="site-main">
+<!-- Page Header -->
+<section class="section hero hero-bg-blog">
+	<div class="hero-overlay"></div>
+	<div class="container">
+		<div class="hero-content">
+			<div class="hero-subtitle">Insights & Knowledge</div>
+			<h1 class="hero-title" style="margin-bottom: 1.5rem;">Blogs & Latest News</h1>
+			<p class="hero-description" style="max-width: 700px;">Stay ahead of the curve with our curated insights, guides, and thoughts on AI marketing, local SEO, website design, and B2B growth.</p>
+		</div>
+	</div>
+</section>
 
-    <!-- Blog Header -->
-    <header class="page-header section-padding bg-light">
-        <div class="container">
-            <span class="subtitle">Industry Insights</span>
-            <h1 class="page-title text-gradient">Stay Ahead of the Curve</h1>
-            <p>Expert articles on SEO, Paid Ads, and Digital Strategy to help you grow your business in 2026.</p>
-        </div>
-    </header>
+<!-- Blog Cards Grid -->
+<section class="section" style="border-bottom: none;">
+	<div class="container">
+		<div class="blog-grid">
+			<?php
+			// Standard WordPress Loop
+			$paged = ( get_query_var( 'paged' ) ) ? get_query_var( 'paged' ) : 1;
+			$blog_args = array(
+				'post_type'      => 'post',
+				'posts_per_page' => 9,
+				'paged'          => $paged
+			);
+			$blog_query = new WP_Query( $blog_args );
 
-    <!-- Blog Grid -->
-    <section id="blog" class="blog section-padding">
-        <div class="container grid-3">
-            <?php
-            // Custom query to fetch posts
-            $args = array(
-                'post_type' => 'post',
-                'posts_per_page' => 6,
-            );
-            $blog_query = new WP_Query($args);
+			if ( $blog_query->have_posts() ) {
+				$b_idx = 1;
+				while ( $blog_query->have_posts() ) {
+					$blog_query->the_post();
+					$thumb = get_template_directory_uri() . '/images/blog-' . ( ( ($b_idx - 1) % 4 ) + 1 ) . '.jpg';
+					?>
+					<div class="card blog-card">
+						<img src="<?php echo esc_url( $thumb ); ?>" class="blog-card-img" alt="<?php the_title_attribute(); ?>">
+						<div class="blog-meta">
+							<span><?php echo get_the_date(); ?></span>
+							<span>&bull;</span>
+							<span>By <?php the_author(); ?></span>
+						</div>
+						<div class="blog-card-content">
+							<h3 style="font-size: 1.35rem; margin-bottom: 1rem; line-height: 1.3;"><?php the_title(); ?></h3>
+							<p><?php echo wp_trim_words( get_the_excerpt(), 22 ); ?></p>
+							<a href="<?php the_permalink(); ?>" class="read-more-link" style="margin-top: auto; padding-top: 1rem;">Read Article &rarr;</a>
+						</div>
+					</div>
+					<?php
+					$b_idx++;
+				}
+				
+				// Pagination
+				echo '<div class="pagination" style="grid-column: 1/-1; display: flex; gap: 1rem; justify-content: center; margin-top: 3rem;">';
+				echo paginate_links( array(
+					'total' => $blog_query->max_num_pages,
+					'current' => $paged,
+					'prev_text' => '&larr; Prev',
+					'next_text' => 'Next &rarr;',
+				) );
+				echo '</div>';
 
-            if ($blog_query->have_posts()) :
-                while ($blog_query->have_posts()) : $blog_query->the_post();
-                    ?>
-                    <article class="blog-card reveal">
-                        <div class="blog-image">
-                            <?php if (has_post_thumbnail()) : ?>
-                                <?php the_post_thumbnail('medium'); ?>
-                            <?php else : ?>
-                                <img src="https://images.unsplash.com/photo-1432888498266-38ffec3eaf0a?q=80&w=1474&auto=format&fit=crop" alt="Blog post">
-                            <?php endif; ?>
-                        </div>
-                        <div class="blog-content">
-                            <span class="blog-date"><?php echo get_the_date(); ?></span>
-                            <h4 style="font-size: 1.8rem; margin-bottom: 1.5rem;"><?php the_title(); ?></h4>
-                            <p style="color: var(--text-muted); margin-bottom: 2rem;"><?php echo wp_trim_words(get_the_excerpt(), 20); ?></p>
-                            <a href="<?php the_permalink(); ?>" class="btn-link">Read Full Article</a>
-                        </div>
-                    </article>
-                    <?php
-                endwhile;
-                wp_reset_postdata();
-            else :
-                // Dummy posts if none exist
-                for($i = 1; $i <= 3; $i++) :
-                    ?>
-                    <article class="blog-card reveal">
-                        <div class="blog-image">
-                            <img src="<?php echo ($i == 1) ? 'https://images.unsplash.com/photo-1432888498266-38ffec3eaf0a?q=80&w=1474&auto=format&fit=crop' : (($i == 2) ? 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=1415&auto=format&fit=crop' : 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=1470&auto=format&fit=crop'); ?>" alt="Blog post">
-                        </div>
-                        <div class="blog-content">
-                            <span class="blog-date">March <?php echo 25 - ($i * 5); ?>, 2026</span>
-                            <h4><?php echo ($i == 1) ? '5 SEO Trends to Watch in 2026' : (($i == 2) ? 'Scale Your Meta Ads for Q4' : 'The Power of Predictive Analytics'); ?></h4>
-                            <p>Expert insights on how to scale your brand using modern data-driven strategies...</p>
-                            <a href="#" class="btn-link">Read More</a>
-                        </div>
-                    </article>
-                <?php
-                endfor;
-            endif;
-            ?>
-        </div>
-    </section>
+				wp_reset_postdata();
+			} else {
+				// Static Fallbacks for scraped content from digigyapan.in
+				$static_blogs = array(
+					array(
+						'img'       => get_template_directory_uri() . '/images/blog-1.jpg',
+						'title'     => 'AI Marketing Services: The Future of Business Growth in the Digital Age',
+						'date'      => 'June 18, 2026',
+						'category'  => 'AI & Growth',
+						'read_time' => '5 min read',
+						'excerpt'   => 'In today’s highly competitive digital landscape, businesses need more than traditional marketing strategies to stay ahead. Consumers expect personalized experiences, instant responses, and highly relevant content.'
+					),
+					array(
+						'img'       => get_template_directory_uri() . '/images/blog-2.jpg',
+						'title'     => 'Performance Marketing Agency: The Complete Guide to ROI-Driven Digital Growth',
+						'date'      => 'May 12, 2026',
+						'category'  => 'Performance Marketing',
+						'read_time' => '8 min read',
+						'excerpt'   => 'Why Hiring a Performance Marketing Agency Is Essential for Business Growth. In today’s competitive digital landscape, businesses need more than basic traffic—they need conversions, leads, and sales.'
+					),
+					array(
+						'img'       => get_template_directory_uri() . '/images/blog-3.jpg',
+						'title'     => 'Online Reputation Management: How Businesses Build Trust, Visibility & Credibility Online',
+						'date'      => 'April 20, 2026',
+						'category'  => 'Reputation & Trust',
+						'read_time' => '6 min read',
+						'excerpt'   => 'In today’s digital-first business environment, your online reputation directly influences customer trust, buying decisions, search visibility, and credibility online.'
+					),
+					array(
+						'img'       => get_template_directory_uri() . '/images/blog-4.jpg',
+						'title'     => 'LinkedIn Personal Branding: How Professionals Build Authority, Trust & Leads in 2026',
+						'date'      => 'March 05, 2026',
+						'category'  => 'LinkedIn Optimization',
+						'read_time' => '7 min read',
+						'excerpt'   => 'LinkedIn is no longer just a digital resume platform. In 2026, it has become one of the most powerful ecosystems for authority building, B2B lead generation, and professional networking.'
+					)
+				);
 
-</main>
+				foreach ( $static_blogs as $post ) {
+					?>
+					<div class="card blog-card">
+						<img src="<?php echo esc_url( $post['img'] ); ?>" class="blog-card-img" alt="<?php echo esc_attr( $post['title'] ); ?>">
+						<div class="blog-meta">
+							<span><?php echo esc_html( $post['date'] ); ?></span>
+							<span>&bull;</span>
+							<span><?php echo esc_html( $post['read_time'] ); ?></span>
+						</div>
+						<div class="blog-card-content">
+							<span class="text-muted" style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; display: block; margin-bottom: 0.5rem;"><?php echo esc_html( $post['category'] ); ?></span>
+							<h3 style="font-size: 1.35rem; margin-bottom: 1rem; line-height: 1.3;"><?php echo esc_html( $post['title'] ); ?></h3>
+							<p><?php echo esc_html( $post['excerpt'] ); ?></p>
+							<a href="#" class="read-more-link" style="margin-top: auto; padding-top: 1rem;" onclick="alert('In a live environment, this links to the full post details. Our theme supports WordPress loop generation out-of-the-box.'); return false;">Read Article &rarr;</a>
+						</div>
+					</div>
+					<?php
+				}
+			}
+			?>
+		</div>
+	</div>
+</section>
 
-<?php get_footer(); ?>
+<?php
+get_footer();
+?>
